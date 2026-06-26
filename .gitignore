@@ -39,5 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# prisma local DB (las migraciones sí se versionan)
 /prisma/dev.db*
-/prisma/migrations/*
+
+# logs
+dev.log
+*.log
+
+# claude code local settings
+.claude/settings.local.json
