@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "Bash(dir \"C:\\\\Users\\\\usuario\\\\Proyectos\\\\analisismercado\")",
+      "Bash(git --version)",
+      "Bash(git ls-remote *)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "PowerShell(Test-Path *)",
+      "PowerShell(git clone --depth 1 https://github.com/sickn33/antigravity-awesome-skills \"$env:TEMP\\\\aas\" 2>&1 | Select-Object -Last 5)",
+      "PowerShell(Get-ChildItem *)",
+      "Bash(npm --version)",
+      "Bash(npx --version)",
+      "Read(//c/Users/usuario/Proyectos/**)",
+      "Bash(npx --yes create-next-app@latest analisismercado --typescript --tailwind --app --eslint --no-src-dir --import-alias \"@/*\" --use-npm --no-turbopack)"
+    ]
+  }
+}
