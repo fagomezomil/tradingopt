@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Portfolio {
+  id        String   @id @default(cuid())
+  nombre    String
+  cash      Float    @default(100000)
+  createdAt DateTime @default(now())
+  posiciones Posicion[]
+  ordenes    Orden[]
+}
+
+model Posicion {
+  id         String   @id @default(cuid())
+  portfolioId String
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  ticker     String
+  cantidad   Float
+  precioEntrada Float
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([portfolioId, ticker])
+}
+
+model Orden {
+  id         String   @id @default(cuid())
+  portfolioId String
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  ticker     String
+  lado       String   // BUY | SELL
+  tipo       String   // MARKET | LIMIT
+  cantidad   Float
+  precio     Float?
+  precioEjecucion Float?
+  estado     String   // PENDING | FILLED | CANCELLED
+  createdAt  DateTime @default(now())
+  ejecutadaAt DateTime?
+}
+
+model Estrategia {
+  id         String   @id @default(cuid())
+  ticker     String
+  tesis      String
+  indicadores String  // JSON serializado
+  entrada    Float?
+  stop       Float?
+  objetivo   Float?
+  riesgo    String?
+  horizonte  String?
+  rawJson   String   // respuesta completa del agente
+  createdAt DateTime @default(now())
+}
+
+model Backtest {
+  id         String   @id @default(cuid())
+  ticker     String
+  estrategia String
+  paramsJson String
+  equityCurveJson String
+  metricsJson String
+  createdAt DateTime @default(now())
+}
