@@ -11,13 +11,21 @@ interface TickerData {
   name?: string;
   bullish_case?: string | null;
   bearish_case?: string | null;
+  previous_close?: number;
+  change?: number;
+  change_pct?: number;
+  day_high?: number;
+  day_low?: number;
+  fifty_two_week_high?: number;
+  fifty_two_week_low?: number;
+  currency?: string;
   nota?: string;
 }
 
 interface ApiResponse {
   ticker: string;
   esIndice?: boolean;
-  heliumCompatible?: boolean;
+  fuente?: "helium" | "yahoo";
   data: TickerData;
   error?: string;
 }
@@ -26,7 +34,7 @@ export default function DashboardPage() {
   const [ticker, setTicker] = useState("AAPL");
   const [active, setActive] = useState("AAPL");
   const [data, setData] = useState<TickerData | null>(null);
-  const [meta, setMeta] = useState<{ esIndice: boolean; heliumCompatible: boolean } | null>(null);
+  const [meta, setMeta] = useState<{ esIndice: boolean; fuente: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,7 +48,7 @@ export default function DashboardPage() {
       setData(json.data);
       setMeta({
         esIndice: json.esIndice ?? false,
-        heliumCompatible: json.heliumCompatible ?? true,
+        fuente: json.fuente ?? "helium",
       });
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -105,7 +113,31 @@ export default function DashboardPage() {
           {price != null && (
             <div className="ml-4">
               <div className="text-xs text-foreground/60">{data?.name ?? active}</div>
-              <div className="text-2xl font-semibold">${price.toFixed(2)}</div>
+              <div className="flex items-baseline gap-2">
+                <div className="text-2xl font-semibold">
+                  {price.toLocaleString("en-US", {
+                    style: "currency",
+                    currency: data?.currency ?? "USD",
+                  })}
+                </div>
+                {data?.change != null && data?.change_pct != null && (
+                  <div
+                    className={cn(
+                      "text-sm font-medium",
+                      data.change >= 0 ? "text-green-600" : "text-red-600"
+                    )}
+                  >
+                    {data.change >= 0 ? "+" : ""}
+                    {data.change.toFixed(2)} ({(data.change_pct * 100).toFixed(2)}%)
+                  </div>
+                )}
+              </div>
+              {data?.day_high != null && data?.day_low != null && (
+                <div className="text-xs text-foreground/50 mt-0.5">
+                  Día: {data.day_low.toFixed(2)} – {data.day_high.toFixed(2)} · Cierre prev:{" "}
+                  {data.previous_close?.toFixed(2) ?? "—"}
+                </div>
+              )}
             </div>
           )}
           {error && <div className="text-sm text-red-600">Error: {error}</div>}
@@ -133,9 +165,8 @@ export default function DashboardPage() {
       {meta?.esIndice && (
         <Card className="border-amber-400/40 bg-amber-50/40">
           <p className="text-xs text-amber-900">
-            <strong>{active}</strong> es un índice bursátil. helium-mcp no los soporta, así que no
-            hay precio live ni casos bullish/bearish. El gráfico histórico sí funciona vía Yahoo
-            Finance.
+            <strong>{active}</strong> es un índice bursátil. Precio live vía Yahoo Finance. Sin
+            casos bullish/bearish de IA (helium-mcp no los soporta).
           </p>
         </Card>
       )}
